@@ -1,6 +1,6 @@
 import React, { useState, useContext } from "react";
 import { useNavigate, useParams } from 'react-router-dom';
-import './ResumePage.css'
+import './ResumePage.css';
 import ResumeNav from "../../components/ResumeCommon/ResumeNav";
 import styled from "styled-components";
 import CategoryList from "../../components/ResumeCategory/CategoryList";
@@ -12,14 +12,14 @@ const CategoryContainer = styled.div`
     width: 400px;
     height: 600px;
     background-color: rgba(0, 30, 89, 1);
-`
+`;
 
 const CategoryContainer2 = styled.div`
-    width:85%;
+    width: 85%;
     height: 90%;
     background-color: white;
     border-radius: 5px;
-`
+`;
 
 const Title = styled.h3`
     margin-top: 25px;
@@ -27,14 +27,14 @@ const Title = styled.h3`
     margin-bottom: 15px;
     background-color: white;
     color: black;
-`
+`;
 
 const Line = styled.div`
     height: 1px;
     margin-left: 20px;
     width: 300px;
     background-color: rgba(0, 30, 89, 1);
-`
+`;
 
 const Button = styled.button`
     width: 90px;
@@ -46,20 +46,22 @@ const Button = styled.button`
     border-radius: 5px;
     border: none;
     cursor: pointer;
-`
+`;
 
 const ResumeTitle = styled.input`
     display: flex;
     align-items: center;
     width: 700px;
-    height: 30px;
+    height: 40px;
     font-size: 20px;
-    padding: 15px;
+    padding: 10px;
     border-radius: 5px;
     border-color: rgba(89, 127, 200, 1);
     border-width: 3px;
     border-style: solid;
-`
+    line-height: 1.5;
+    box-sizing: border-box;
+`;
 
 function ResumePage({ baseUrl }) {
     const navigate = useNavigate();
@@ -68,16 +70,14 @@ function ResumePage({ baseUrl }) {
     const [resumeTitle, setResumeTitle] = useState("");
     const { skills } = useContext(SkillContext);
 
-    // sections 배열: CategoryList 컴포넌트에서 전달 받은 현재 열려 있는 섹션들의 이름 배열
     const handleSectionChange = (sections) => {
-        setActiveSections(sections); // activeSections 상태를 업데이트
+        setActiveSections(sections);
     };
 
     const handleTitleChange = (event) => {
         setResumeTitle(event.target.value);
     };
 
-    // 이력서 저장 API 호출
     const handleSave = () => {
         onUpdateSkills(skills);
     };
@@ -96,14 +96,18 @@ function ResumePage({ baseUrl }) {
                 });
             })
         )
-        .then(responses => {
-            console.log("Skills updated successfully", responses);
-            alert("Skills updated successfully");
-        })
-        .catch(error => {
-            console.error("Error updating skills:", error);
-            alert("Error updating skills");
-        });
+            .then(responses => {
+                console.log("Skills updated successfully", responses);
+                alert("Skills updated successfully");
+            })
+            .catch(error => {
+                console.error("Error updating skills:", error);
+                alert("Error updating skills");
+            });
+    };
+    // 인쇄 대화 상자
+    const handlePrint = () => {
+        window.print();
     };
 
     return (
@@ -123,13 +127,16 @@ function ResumePage({ baseUrl }) {
                 </div>
                 <div className="form-container">
                     <div style={{marginTop: 25, marginRight: 25, display:"flex", justifyContent:'end', gap: 10}}>
-                        <Button onClick={() => navigate(`/resumes/${resumeId}/preview`)}>미리보기</Button>
+                        <Button onClick={() => navigate(`/resumes/${resumeId}/preview`)}>테스트</Button>
                         <Button onClick={handleSave}>저장</Button>
+                        <Button onClick={handlePrint}>PDF 인쇄</Button>
                     </div>
-                    <div style={{display:'flex', justifyContent:'center', marginTop: 30, marginBottom:10}}>
-                        <ResumeTitle type="text" vaue={resumeTitle} onChange={handleTitleChange} placeholder="이력서 제목 (저장용)"/>
+                    <div id="printContent" style={{ width: '100%', padding: '20px', background: 'white' }}>
+                        <div style={{display:'flex', justifyContent:'center', marginTop: 30, marginBottom:10}}>
+                            <ResumeTitle type="text" value={resumeTitle} onChange={handleTitleChange} placeholder="이력서 제목 (저장용)"/>
+                        </div>
+                        <FormContent activeSections={activeSections}/>
                     </div>
-                    <FormContent activeSections={activeSections}/>
                 </div>
             </div>
         </div>

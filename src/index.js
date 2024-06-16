@@ -23,4 +23,3 @@ root.render(
 );
 
 reportWebVitals(); // 성능 측정
-

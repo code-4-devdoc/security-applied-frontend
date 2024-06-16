@@ -2,7 +2,7 @@ import React from 'react';
 import styled from "styled-components";
 
 const Container = styled.div`
-    border: 2px solid rgba(239, 245, 255, 1);  /* 하늘색 테두리 */
+    border: 2px solid rgb(177, 205, 253); /* 하늘색 테두리 */
     padding: 20px;
     margin-bottom: 40px;
     border-radius: 5px;

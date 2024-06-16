@@ -50,6 +50,27 @@
 }
 
 
+/* print.css */
+/* 인쇄할 때만 선택한 항목들이 보이도록 함 */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+
+    #printContent, #printContent * {
+        visibility: visible;
+    }
+
+    #printContent {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: auto;
+    }
+}
+
+
 /*
 .container {
     width: 80vw;
