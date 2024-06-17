@@ -133,7 +133,7 @@ function ResumePage({ baseUrl }) {
                 </div>
                 <div className="form-container">
                     <div style={{ marginTop: 25, marginRight: 25, display: "flex", justifyContent: 'end', gap: 10 }}>
-                        <Button onClick={() => navigate(`/resumes/${resumeId}/preview`)}>테스트</Button>
+
                         <Button onClick={handleSave}>전체 저장</Button>
                         <Button onClick={handlePrint}>PDF 인쇄</Button>
                     </div>

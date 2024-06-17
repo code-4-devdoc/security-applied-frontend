@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from "styled-components";
-
+import { call } from "../../../service/ApiService";
 
 const Border = styled.div`
     border-style: solid;
@@ -12,16 +12,6 @@ const Border = styled.div`
     padding-bottom: 20px;
 `;
 
-const Button = styled.button`
-    width: 25px; height: 25px;
-    background-color: ${props => props.active ? 'rgba(175, 175, 175, 1)' : 'rgba(129, 172, 255, 1)'};
-    color: white;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    margin-right: 10px; margin-top: 7px;
-`;
-
 const Input = styled.input`
     padding: 8px;
     border: 1px solid #ccc;
@@ -29,7 +19,7 @@ const Input = styled.input`
     font-size: 15px;
 `;
 
-const AwardRecord = ({ index, award, onRemove, onUpdate }) => {
+const AwardRecord = ({ index, award, onRemove, onUpdate, resumeId }) => {
     const [error, setError] = useState('');
 
     const handleInputChange = (field, value) => {
@@ -49,16 +39,12 @@ const AwardRecord = ({ index, award, onRemove, onUpdate }) => {
         }
     };
 
-
-
-    const [isActive, setIsActive] = useState(false);
-    const [description, setDescription] = useState(award.description || "");
-
-    const toggleActive = () => {
-        setIsActive(prev => !prev);
-        if (isActive) {
-            setDescription(""); // 비활성화 시 텍스트 초기화
-            handleInputChange('description', ""); // 비활성화 시 description 초기화
+    const handleRemove = async () => {
+        try {
+            await call(`/api/resumes/${resumeId}/awards/${award.id}`, "DELETE");
+            onRemove();
+        } catch (error) {
+            console.error("Failed to delete award data", error);
         }
     };
 
@@ -73,7 +59,7 @@ const AwardRecord = ({ index, award, onRemove, onUpdate }) => {
                     backgroundColor: "rgba(18, 73, 156, 50%)",
                     color: "white",
                     border: "none"
-                }} onClick={onRemove}>-
+                }} onClick={handleRemove}>-
                 </button>
             </div>
             <div style={{ display: "flex", height: 35, marginTop: 5, gap: 5 }}>
@@ -88,13 +74,9 @@ const AwardRecord = ({ index, award, onRemove, onUpdate }) => {
                 <Input as="textarea"
                        style={{ width: 590, height: 50, fontFamily: "inherit" }}
                        placeholder="부연 설명을 입력하세요."
-                       disabled={!isActive}
-                       value={description}
-                       onChange={e => handleInputChange('description', e.target.value)}
+                       value={award.description}
+                       onChange={(e) => handleInputChange('description', e.target.value)}
                 />
-                <Button style={{ marginTop: 40, marginLeft: 5 }} onClick={toggleActive} active={isActive}>
-                    {isActive ? '-' : '+'}
-                </Button>
             </div>
         </Border>
     );

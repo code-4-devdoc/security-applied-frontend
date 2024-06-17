@@ -9,7 +9,7 @@ const Language = ({ languages, setLanguages }) => {
         if (savedLanguages) {
             setLanguages(savedLanguages);
         } else {
-            setLanguages([{ id: 0, language: '', testName: '', score: '', date: '' }]);
+            setLanguages([{ id: null, language: '', testName: '', score: '', date: '' }]);
         }
     }, [setLanguages]);
 
