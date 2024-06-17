@@ -42,7 +42,7 @@ const CategoryList = ({ onSectionChange }) => {
                     <span style={{ width: 100, fontWeight: 'bold' }}>{section.name}</span>
                     <span style={{ width: 80, textAlign: 'left' }}>{section.detail}</span>
                     <button
-                        className={section.isOpen ? 'button-plus' : 'button-minus'}
+                        className={section.isOpen ? 'button-minus' : 'button-plus'}
                         onClick={() => toggleSection(index)}
                     >
                         {section.isOpen ? '-' : '+'}

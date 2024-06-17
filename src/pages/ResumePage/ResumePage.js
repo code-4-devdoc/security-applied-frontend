@@ -1,11 +1,11 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from 'react-router-dom';
 import './ResumePage.css';
 import ResumeNav from "../../components/ResumeCommon/ResumeNav";
 import styled from "styled-components";
 import CategoryList from "../../components/ResumeCategory/CategoryList";
 import FormContent from "../../components/ResumeForm/FormContent";
-import { SkillContext } from "../../contexts/SkillContext";
+import { call } from "../../service/ApiService";
 
 const CategoryContainer = styled.div`
     margin-left: 20px;
@@ -69,15 +69,20 @@ function ResumePage({ baseUrl }) {
     const [activeSections, setActiveSections] = useState([]);
     const [resumeTitle, setResumeTitle] = useState("");
     const [languages, setLanguages] = useState([]);
-    const { skills } = useContext(SkillContext);
 
     useEffect(() => {
-        const savedTitle = localStorage.getItem(`resumeTitle-${resumeId}`);
-        const savedActiveSections = JSON.parse(localStorage.getItem(`activeSections-${resumeId}`));
-        const savedLanguages = JSON.parse(localStorage.getItem(`languages-${resumeId}`));
-        if (savedTitle) setResumeTitle(savedTitle);
-        if (savedActiveSections) setActiveSections(savedActiveSections);
-        if (savedLanguages) setLanguages(savedLanguages);
+        const fetchData = async () => {
+            try {
+                const response = await call(`/api/resumes/${resumeId}`, "GET");
+                const { title, languages } = response;
+                setResumeTitle(title);
+                setLanguages(languages);
+                setActiveSections(['Language']);  // 항상 Language 섹션을 활성화합니다.
+            } catch (error) {
+                console.error("Failed to fetch resume data", error);
+            }
+        };
+        fetchData();
     }, [resumeId]);
 
     const handleSectionChange = (sections) => {
@@ -88,11 +93,17 @@ function ResumePage({ baseUrl }) {
         setResumeTitle(event.target.value);
     };
 
-    const handleSave = () => {
-        localStorage.setItem(`resumeTitle-${resumeId}`, resumeTitle);
-        localStorage.setItem(`activeSections-${resumeId}`, JSON.stringify(activeSections));
-        localStorage.setItem(`languages-${resumeId}`, JSON.stringify(languages));
-        alert('현재 페이지가 저장되었습니다.');
+    const handleSave = async () => {
+        try {
+            const data = {
+                title: resumeTitle,
+                languages: languages,
+            };
+            await call(`/api/resumes/${resumeId}/save`, "POST", data);
+            alert('현재 페이지가 저장되었습니다.');
+        } catch (error) {
+            console.error("Failed to save resume data", error);
+        }
     };
 
     const handlePrint = () => {

@@ -10,7 +10,7 @@ export function call(api, method, request) {
   });
 
   // 로컬 스토리지에서 ACCESS TOKEN 가져오기
-  const accessToken = localStorage.getItem("ACCESS_TOKEN");
+  const accessToken = localStorage.getItem(ACCESS_TOKEN);
   if (accessToken && accessToken !== null) {
     headers.append("Authorization", "Bearer " + accessToken); // 토큰이 있을 경우 헤더에 추가
   }
