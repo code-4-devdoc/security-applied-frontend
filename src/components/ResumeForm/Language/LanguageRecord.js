@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styled from "styled-components";
+import { call } from "../../../service/ApiService";
 
 const Border = styled.div`
     border-style: solid;
@@ -18,7 +19,7 @@ const Input = styled.input`
     font-size: 15px;
 `;
 
-const LanguageRecord = ({ index, language, onRemove, onUpdate }) => {
+const LanguageRecord = ({ index, language, onRemove, onUpdate, resumeId }) => {
     const [error, setError] = useState('');
 
     const handleInputChange = (field, value) => {
@@ -38,6 +39,15 @@ const LanguageRecord = ({ index, language, onRemove, onUpdate }) => {
         }
     };
 
+    const handleRemove = async () => {
+        try {
+            await call(`/api/resumes/${resumeId}/languages/${language.id}`, "DELETE");
+            onRemove();
+        } catch (error) {
+            console.error("Failed to delete language data", error);
+        }
+    };
+
     return (
         <Border>
             <div style={{ display: "flex", justifyContent: "flex-end" }}>
@@ -49,7 +59,7 @@ const LanguageRecord = ({ index, language, onRemove, onUpdate }) => {
                     backgroundColor: "rgba(18, 73, 156, 50%)",
                     color: "white",
                     border: "none"
-                }} onClick={onRemove}>-
+                }} onClick={handleRemove}>-
                 </button>
             </div>
             <div style={{ display: "flex", height: 35, marginTop: 5, gap: 5 }}>

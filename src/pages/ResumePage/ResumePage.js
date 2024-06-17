@@ -135,7 +135,7 @@ function ResumePage({ baseUrl }) {
                         <div style={{ display: 'flex', justifyContent: 'center', marginTop: 30, marginBottom: 10 }}>
                             <ResumeTitle type="text" value={resumeTitle} onChange={handleTitleChange} placeholder="이력서 제목 (저장용)" />
                         </div>
-                        <FormContent activeSections={activeSections} languages={languages} setLanguages={setLanguages} />
+                        <FormContent activeSections={activeSections} languages={languages} setLanguages={setLanguages} resumeId={resumeId} />
                     </div>
                 </div>
             </div>
