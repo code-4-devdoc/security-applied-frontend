@@ -5,7 +5,7 @@ import ResumeNav from "../../components/ResumeCommon/ResumeNav";
 import styled from "styled-components";
 import CategoryList from "../../components/ResumeCategory/CategoryList";
 import FormContent from "../../components/ResumeForm/FormContent";
-import { call } from "../../service/ApiService";
+import { call } from "../../service/ApiService"; // 추가된 부분
 
 const CategoryContainer = styled.div`
     margin-left: 20px;
@@ -69,15 +69,17 @@ function ResumePage({ baseUrl }) {
     const [activeSections, setActiveSections] = useState([]);
     const [resumeTitle, setResumeTitle] = useState("");
     const [languages, setLanguages] = useState([]);
+    const [awards, setAwards] = useState([]);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const response = await call(`/api/resumes/${resumeId}`, "GET");
-                const { title, languages } = response;
-                setResumeTitle(title);
-                setLanguages(languages);
-                setActiveSections(['Language']);  // 항상 Language 섹션을 활성화합니다.
+                const { title, languages, awards } = response;
+                setResumeTitle(title || "");
+                setLanguages(languages || []);
+                setAwards(awards || []);
+                setActiveSections(['Language', 'Award']);  // 항상 Language와 Award 섹션을 활성화합니다.
             } catch (error) {
                 console.error("Failed to fetch resume data", error);
             }
@@ -98,42 +100,17 @@ function ResumePage({ baseUrl }) {
             const data = {
                 title: resumeTitle,
                 languages: languages,
+                awards: awards,
             };
 
-            // Fetch existing data for comparison
-            const response = await call(`/api/resumes/${resumeId}`, "GET");
-            const { languages: existingLanguages } = response;
+            await call(`/api/resumes/${resumeId}/save`, "POST", data);
 
-            // Separate new and existing languages
-            const languagesToUpdate = languages.filter(lang => {
-                const existingLang = existingLanguages.find(el => el.id === lang.id);
-                return existingLang && (
-                    existingLang.language !== lang.language ||
-                    existingLang.testName !== lang.testName ||
-                    existingLang.score !== lang.score ||
-                    existingLang.date !== lang.date
-                );
-            });
-
-            const newLanguages = languages.filter(lang => !existingLanguages.some(el => el.id === lang.id));
-
-            // Update each modified language
-            for (const lang of languagesToUpdate) {
-                await call(`/api/resumes/${resumeId}/languages`, "PUT", lang);
-            }
-
-            // Save new languages
-            for (const lang of newLanguages) {
-                await call(`/api/resumes/${resumeId}/languages`, "POST", lang);
-            }
-
-            alert('현재 페이지가 저장되었습니다.');
+            alert('전체 저장이 완료되었습니다.');
+            navigate("/resumes"); // 저장 후 리다이렉트
         } catch (error) {
             console.error("Failed to save resume data", error);
         }
     };
-
-
 
     const handlePrint = () => {
         window.print();
@@ -157,14 +134,14 @@ function ResumePage({ baseUrl }) {
                 <div className="form-container">
                     <div style={{ marginTop: 25, marginRight: 25, display: "flex", justifyContent: 'end', gap: 10 }}>
                         <Button onClick={() => navigate(`/resumes/${resumeId}/preview`)}>테스트</Button>
-                        <Button onClick={handleSave}>현재 페이지 저장</Button>
+                        <Button onClick={handleSave}>전체 저장</Button>
                         <Button onClick={handlePrint}>PDF 인쇄</Button>
                     </div>
                     <div id="printContent" style={{ width: '100%', padding: '20px', background: 'white' }}>
                         <div style={{ display: 'flex', justifyContent: 'center', marginTop: 30, marginBottom: 10 }}>
                             <ResumeTitle type="text" value={resumeTitle} onChange={handleTitleChange} placeholder="이력서 제목 (저장용)" />
                         </div>
-                        <FormContent activeSections={activeSections} languages={languages} setLanguages={setLanguages} resumeId={resumeId} />
+                        <FormContent activeSections={activeSections} languages={languages} setLanguages={setLanguages} awards={awards} setAwards={setAwards} resumeId={resumeId} />
                     </div>
                 </div>
             </div>
@@ -173,3 +150,4 @@ function ResumePage({ baseUrl }) {
 };
 
 export default ResumePage;
+

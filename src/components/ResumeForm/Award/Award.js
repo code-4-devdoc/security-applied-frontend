@@ -1,17 +1,26 @@
-import React, {useState} from 'react';
-import AwardRecord from "./AwardRecord"
-import SectionContainer from "../../ResumeCommon/SectionContainer";
+import React, { useState, useEffect } from 'react';
 import AddRecord from "../../ResumeCommon/AddRecord";
+import SectionContainer from "../../ResumeCommon/SectionContainer";
+import AwardRecord from "./AwardRecord";
 
-const Award = () => {
-    const [awards, setAwards] = useState([
-        <AwardRecord key={0} onRemove={() => removeAward(0)} />
-    ]);
+const Award = ({ awards, setAwards }) => {
+    useEffect(() => {
+        const savedAwards = JSON.parse(localStorage.getItem('awards'));
+        if (savedAwards) {
+            setAwards(savedAwards);
+        } else {
+            setAwards([{ id: 0, awardName: '', awardingInstitution: '', date: '', description: '' }]);
+        }
+    }, [setAwards]);
+
+    useEffect(() => {
+        localStorage.setItem('awards', JSON.stringify(awards));
+    }, [awards]);
 
     const addAward = () => {
         setAwards(prev => [
             ...prev,
-            <AwardRecord key={prev.length} onRemove={() => removeAward(prev.length)} />
+            { id: prev.length, awardName: '', awardingInstitution: '', date: '', description: '' }
         ]);
     };
 
@@ -19,10 +28,22 @@ const Award = () => {
         setAwards(prev => prev.filter((_, idx) => idx !== index));
     };
 
+    const updateAward = (index, field, value) => {
+        setAwards(prev => prev.map((award, idx) => idx === index ? { ...award, [field]: value } : award));
+    };
+
     return (
         <SectionContainer title="Award">
-            {awards}
-            <div style={{height: 10}}></div>
+            {awards.map((award, index) => (
+                <AwardRecord
+                    key={index}
+                    index={index}
+                    award={award}
+                    onRemove={() => removeAward(index)}
+                    onUpdate={updateAward}
+                />
+            ))}
+            <div style={{ height: 10 }}></div>
             <AddRecord fieldName="수상 이력" onClick={addAward}></AddRecord>
         </SectionContainer>
     );

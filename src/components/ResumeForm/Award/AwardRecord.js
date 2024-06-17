@@ -1,5 +1,6 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import styled from "styled-components";
+
 
 const Border = styled.div`
     border-style: solid;
@@ -9,7 +10,7 @@ const Border = styled.div`
     margin-bottom: 10px;
     padding-left: 20px;
     padding-bottom: 20px;
-`
+`;
 
 const Button = styled.button`
     width: 25px; height: 25px;
@@ -28,17 +29,19 @@ const Input = styled.input`
     font-size: 15px;
 `;
 
-const AwardRecord = ({onRemove}) => {
-
-    const [date, setDate] = useState('');
+const AwardRecord = ({ index, award, onRemove, onUpdate }) => {
     const [error, setError] = useState('');
+
+    const handleInputChange = (field, value) => {
+        onUpdate(index, field, value);
+    };
 
     const validateDate = (date) => {
         return /^\d{4}\.\d{2}$/.test(date);
     };
 
-    const handleDateChange = (setDate, value) => {
-        setDate(value);
+    const handleDateChange = (value) => {
+        handleInputChange('date', value);
         if (validateDate(value) || value === '') {
             setError('');
         } else {
@@ -46,19 +49,22 @@ const AwardRecord = ({onRemove}) => {
         }
     };
 
+
+
     const [isActive, setIsActive] = useState(false);
-    const [value, setValue] = useState("");
+    const [description, setDescription] = useState(award.description || "");
 
     const toggleActive = () => {
         setIsActive(prev => !prev);
         if (isActive) {
-            setValue(""); // 비활성화 시 텍스트 초기화
+            setDescription(""); // 비활성화 시 텍스트 초기화
+            handleInputChange('description', ""); // 비활성화 시 description 초기화
         }
     };
 
     return (
         <Border>
-            <div style={{display: "flex", justifyContent: "flex-end"}}>
+            <div style={{ display: "flex", justifyContent: "flex-end" }}>
                 <button style={{
                     cursor: "pointer",
                     borderRadius: "0px 8px 0px 3px",
@@ -70,24 +76,23 @@ const AwardRecord = ({onRemove}) => {
                 }} onClick={onRemove}>-
                 </button>
             </div>
-            <div style={{display: "flex", height: 35, marginTop: 5, gap: 5}}>
-                <Input style={{width: 150}} placeholder="수상명"/>
-                <Input style={{width: 150}} placeholder="수상 기관"/>
+            <div style={{ display: "flex", height: 35, marginTop: 5, gap: 5 }}>
+                <Input style={{ width: 150 }} placeholder="수상명" value={award.awardName} onChange={(e) => handleInputChange('awardName', e.target.value)} />
+                <Input style={{ width: 150 }} placeholder="수상 기관" value={award.awardingInstitution} onChange={(e) => handleInputChange('awardingInstitution', e.target.value)} />
                 <div>
-                    <Input style={{width: 70}} placeholder="YYYY.MM" value={date}
-                           onChange={(e) => handleDateChange(setDate, e.target.value)}/>
-                    {error && <div style={{fontSize: 13, color: 'rgba(202, 5, 5, 1)'}}>{error}</div>}
+                    <Input style={{ width: 70 }} placeholder="YYYY.MM" value={award.date} onChange={(e) => handleDateChange(e.target.value)} />
+                    {error && <div style={{ fontSize: 13, color: 'rgba(202, 5, 5, 1)' }}>{error}</div>}
                 </div>
             </div>
-            <div style={{display: "flex", marginTop: 5}}>
+            <div style={{ display: "flex", marginTop: 5 }}>
                 <Input as="textarea"
-                       style={{width: 590, height: 50, fontFamily: "inherit"}}
+                       style={{ width: 590, height: 50, fontFamily: "inherit" }}
                        placeholder="부연 설명을 입력하세요."
                        disabled={!isActive}
-                       value={value}
-                       onChange={e => setValue(e.target.value)}
+                       value={description}
+                       onChange={e => handleInputChange('description', e.target.value)}
                 />
-                <Button style={{marginTop: 40, marginLeft: 5}} onClick={toggleActive} active={isActive}>
+                <Button style={{ marginTop: 40, marginLeft: 5 }} onClick={toggleActive} active={isActive}>
                     {isActive ? '-' : '+'}
                 </Button>
             </div>
