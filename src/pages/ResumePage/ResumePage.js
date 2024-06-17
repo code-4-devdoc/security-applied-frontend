@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { useNavigate, useParams } from 'react-router-dom';
 import './ResumePage.css';
 import ResumeNav from "../../components/ResumeCommon/ResumeNav";
@@ -68,7 +68,17 @@ function ResumePage({ baseUrl }) {
     const { resumeId } = useParams();
     const [activeSections, setActiveSections] = useState([]);
     const [resumeTitle, setResumeTitle] = useState("");
+    const [languages, setLanguages] = useState([]);
     const { skills } = useContext(SkillContext);
+
+    useEffect(() => {
+        const savedTitle = localStorage.getItem(`resumeTitle-${resumeId}`);
+        const savedActiveSections = JSON.parse(localStorage.getItem(`activeSections-${resumeId}`));
+        const savedLanguages = JSON.parse(localStorage.getItem(`languages-${resumeId}`));
+        if (savedTitle) setResumeTitle(savedTitle);
+        if (savedActiveSections) setActiveSections(savedActiveSections);
+        if (savedLanguages) setLanguages(savedLanguages);
+    }, [resumeId]);
 
     const handleSectionChange = (sections) => {
         setActiveSections(sections);
@@ -79,33 +89,12 @@ function ResumePage({ baseUrl }) {
     };
 
     const handleSave = () => {
-        onUpdateSkills(skills);
+        localStorage.setItem(`resumeTitle-${resumeId}`, resumeTitle);
+        localStorage.setItem(`activeSections-${resumeId}`, JSON.stringify(activeSections));
+        localStorage.setItem(`languages-${resumeId}`, JSON.stringify(languages));
+        alert('현재 페이지가 저장되었습니다.');
     };
 
-    const onUpdateSkills = (updateSkills) => {
-        console.log("Updating skills:", updateSkills);
-
-        Promise.all(
-            updateSkills.map(skill => {
-                return fetch(`${baseUrl}/api/resumes/${skill.id}/skills`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(skill.content)
-                });
-            })
-        )
-            .then(responses => {
-                console.log("Skills updated successfully", responses);
-                alert("Skills updated successfully");
-            })
-            .catch(error => {
-                console.error("Error updating skills:", error);
-                alert("Error updating skills");
-            });
-    };
-    // 인쇄 대화 상자
     const handlePrint = () => {
         window.print();
     };
@@ -113,29 +102,29 @@ function ResumePage({ baseUrl }) {
     return (
         <div className="app">
             <div className="nav">
-                <ResumeNav defaultActive="작성"/>
+                <ResumeNav defaultActive="작성" />
             </div>
-            <div style={{display:'flex'}}>
+            <div style={{ display: 'flex' }}>
                 <div className="category-container">
-                    <CategoryContainer style={{display: "flex", justifyContent: 'center', alignItems: 'center'}}>
+                    <CategoryContainer style={{ display: "flex", justifyContent: 'center', alignItems: 'center' }}>
                         <CategoryContainer2>
                             <Title>이력서 항목</Title>
-                            <Line/>
+                            <Line />
                             <CategoryList onSectionChange={handleSectionChange}></CategoryList>
                         </CategoryContainer2>
                     </CategoryContainer>
                 </div>
                 <div className="form-container">
-                    <div style={{marginTop: 25, marginRight: 25, display:"flex", justifyContent:'end', gap: 10}}>
+                    <div style={{ marginTop: 25, marginRight: 25, display: "flex", justifyContent: 'end', gap: 10 }}>
                         <Button onClick={() => navigate(`/resumes/${resumeId}/preview`)}>테스트</Button>
-                        <Button onClick={handleSave}>저장</Button>
+                        <Button onClick={handleSave}>현재 페이지 저장</Button>
                         <Button onClick={handlePrint}>PDF 인쇄</Button>
                     </div>
                     <div id="printContent" style={{ width: '100%', padding: '20px', background: 'white' }}>
-                        <div style={{display:'flex', justifyContent:'center', marginTop: 30, marginBottom:10}}>
-                            <ResumeTitle type="text" value={resumeTitle} onChange={handleTitleChange} placeholder="이력서 제목 (저장용)"/>
+                        <div style={{ display: 'flex', justifyContent: 'center', marginTop: 30, marginBottom: 10 }}>
+                            <ResumeTitle type="text" value={resumeTitle} onChange={handleTitleChange} placeholder="이력서 제목 (저장용)" />
                         </div>
-                        <FormContent activeSections={activeSections}/>
+                        <FormContent activeSections={activeSections} languages={languages} setLanguages={setLanguages} />
                     </div>
                 </div>
             </div>

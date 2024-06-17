@@ -1,18 +1,26 @@
-import React, {useState} from 'react';
+import React, { useState, useEffect } from 'react';
 import AddRecord from "../../ResumeCommon/AddRecord";
 import SectionContainer from "../../ResumeCommon/SectionContainer";
 import LanguageRecord from "./LanguageRecord";
 
-const Language = () => {
+const Language = ({ languages, setLanguages }) => {
+    useEffect(() => {
+        const savedLanguages = JSON.parse(localStorage.getItem('languages'));
+        if (savedLanguages) {
+            setLanguages(savedLanguages);
+        } else {
+            setLanguages([{ id: 0, language: '', testName: '', score: '', date: '' }]);
+        }
+    }, [setLanguages]);
 
-    const [languages, setLanguages] = useState([
-        <LanguageRecord key={0} onRemove={() => removeLanguage(0)} />
-    ]);
+    useEffect(() => {
+        localStorage.setItem('languages', JSON.stringify(languages));
+    }, [languages]);
 
     const addLanguage = () => {
         setLanguages(prev => [
             ...prev,
-            <LanguageRecord key={prev.length} onRemove={() => removeLanguage(prev.length)} />
+            { id: prev.length, language: '', testName: '', score: '', date: '' }
         ]);
     };
 
@@ -20,10 +28,22 @@ const Language = () => {
         setLanguages(prev => prev.filter((_, idx) => idx !== index));
     };
 
+    const updateLanguage = (index, field, value) => {
+        setLanguages(prev => prev.map((lang, idx) => idx === index ? { ...lang, [field]: value } : lang));
+    };
+
     return (
         <SectionContainer title="Language">
-            {languages}
-            <div style={{height: 10}}></div>
+            {languages.map((lang, index) => (
+                <LanguageRecord
+                    key={index}
+                    index={index}
+                    language={lang}
+                    onRemove={() => removeLanguage(index)}
+                    onUpdate={updateLanguage}
+                />
+            ))}
+            <div style={{ height: 10 }}></div>
             <AddRecord fieldName="어학 점수" onClick={addLanguage}></AddRecord>
         </SectionContainer>
     );

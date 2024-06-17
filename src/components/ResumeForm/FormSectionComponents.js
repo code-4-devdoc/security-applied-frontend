@@ -15,11 +15,11 @@ const formSectionComponents = {
     'Education': Education,
     'Career': Career,
     'Project': Project,
-    'Award' : Award,
-    'Certificate' : Certificate,
-    'Training' : Training,
-    'Language' : Language,
-    'Activity' : Activity,
+    'Award': Award,
+    'Certificate': Certificate,
+    'Training': Training,
+    'Language': Language,
+    'Activity': Activity,
 };
 
 export default formSectionComponents;

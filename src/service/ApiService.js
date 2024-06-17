@@ -27,19 +27,19 @@ export function call(api, method, request) {
 
   return fetch(options.url, options)
       .then((response) =>
-          response.json().then((json) => {
+          response.text().then((text) => {
             if (!response.ok) {
-              return Promise.reject(json); // 응답이 정상적이지 않을 경우 에러 처리
+              return Promise.reject(text);
             }
-            return json; // 정상 응답 반환
+            return text ? JSON.parse(text) : {}; // JSON 응답이 비어있을 경우 처리
           })
       )
       .catch((error) => {
-        console.log(error.status); // 에러 상태 로깅
+        console.error(error);
         if (error.status === 403) {
-          window.location.href = "/login"; // 403 에러 시 로그인 페이지로 리디렉트
+          window.location.href = "/login";
         }
-        return Promise.reject(error); // 에러 반환
+        return Promise.reject(error);
       });
 }
 
