@@ -76,3 +76,4 @@ const LanguageRecord = ({ index, language, onRemove, onUpdate, resumeId }) => {
 };
 
 export default LanguageRecord;
+

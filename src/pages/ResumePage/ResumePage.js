@@ -99,12 +99,41 @@ function ResumePage({ baseUrl }) {
                 title: resumeTitle,
                 languages: languages,
             };
-            await call(`/api/resumes/${resumeId}/save`, "POST", data);
+
+            // Fetch existing data for comparison
+            const response = await call(`/api/resumes/${resumeId}`, "GET");
+            const { languages: existingLanguages } = response;
+
+            // Separate new and existing languages
+            const languagesToUpdate = languages.filter(lang => {
+                const existingLang = existingLanguages.find(el => el.id === lang.id);
+                return existingLang && (
+                    existingLang.language !== lang.language ||
+                    existingLang.testName !== lang.testName ||
+                    existingLang.score !== lang.score ||
+                    existingLang.date !== lang.date
+                );
+            });
+
+            const newLanguages = languages.filter(lang => !existingLanguages.some(el => el.id === lang.id));
+
+            // Update each modified language
+            for (const lang of languagesToUpdate) {
+                await call(`/api/resumes/${resumeId}/languages`, "PUT", lang);
+            }
+
+            // Save new languages
+            for (const lang of newLanguages) {
+                await call(`/api/resumes/${resumeId}/languages`, "POST", lang);
+            }
+
             alert('현재 페이지가 저장되었습니다.');
         } catch (error) {
             console.error("Failed to save resume data", error);
         }
     };
+
+
 
     const handlePrint = () => {
         window.print();
