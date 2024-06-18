@@ -5,7 +5,9 @@ import ResumeNav from "../../components/ResumeCommon/ResumeNav";
 import styled from "styled-components";
 import CategoryList from "../../components/ResumeCategory/CategoryList";
 import FormContent from "../../components/ResumeForm/FormContent";
-import { call } from "../../service/ApiService"; // 추가된 부분
+import { call } from "../../service/ApiService";
+
+// ResumePage.js: 이력서 작성 페이지(/resumes/{resumeId})를 구성, 데이터 불러오기, 저장하기 등의 기능을 담당
 
 const CategoryContainer = styled.div`
     margin-left: 20px;
@@ -71,6 +73,7 @@ function ResumePage({ baseUrl }) {
     const [languages, setLanguages] = useState([]);
     const [awards, setAwards] = useState([]);
 
+    // 데이터 불러오기
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -79,7 +82,7 @@ function ResumePage({ baseUrl }) {
                 setResumeTitle(title || "");
                 setLanguages(languages || []);
                 setAwards(awards || []);
-                setActiveSections(['Language', 'Award']);  // 항상 Language와 Award 섹션을 활성화합니다.
+                setActiveSections(['Language', 'Award']);  // 항상 Language와 Award 섹션을 활성화
             } catch (error) {
                 console.error("Failed to fetch resume data", error);
             }
@@ -87,14 +90,17 @@ function ResumePage({ baseUrl }) {
         fetchData();
     }, [resumeId]);
 
+    // 항목 변경
     const handleSectionChange = (sections) => {
         setActiveSections(sections);
     };
 
+    // 제목 변경
     const handleTitleChange = (event) => {
         setResumeTitle(event.target.value);
     };
 
+    // 전체 저장
     const handleSave = async () => {
         try {
             const data = {
@@ -106,12 +112,13 @@ function ResumePage({ baseUrl }) {
             await call(`/api/resumes/${resumeId}/save`, "POST", data);
 
             alert('전체 저장이 완료되었습니다.');
-            navigate("/resumes"); // 저장 후 리다이렉트
+            navigate("/resumes"); // 저장 후 /resumes 페이지로 리다이렉트
         } catch (error) {
             console.error("Failed to save resume data", error);
         }
     };
 
+    // PDF 인쇄, 저장, 미리보기
     const handlePrint = () => {
         window.print();
     };
@@ -133,7 +140,6 @@ function ResumePage({ baseUrl }) {
                 </div>
                 <div className="form-container">
                     <div style={{ marginTop: 25, marginRight: 25, display: "flex", justifyContent: 'end', gap: 10 }}>
-
                         <Button onClick={handleSave}>전체 저장</Button>
                         <Button onClick={handlePrint}>PDF 인쇄</Button>
                     </div>

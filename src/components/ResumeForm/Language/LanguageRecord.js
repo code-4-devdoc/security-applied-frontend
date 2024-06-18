@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import styled from "styled-components";
 import { call } from "../../../service/ApiService";
 
+// LanguageRecord.js: 개별 Language 항목의 입력을 처리하고 관리
+
 const Border = styled.div`
     border-style: solid;
     border-width: 2px;
@@ -20,16 +22,20 @@ const Input = styled.input`
 `;
 
 const LanguageRecord = ({ index, language, onRemove, onUpdate, resumeId }) => {
+    // 에러 상태 관리
     const [error, setError] = useState('');
 
+    // 입력 값 변경 핸들러
     const handleInputChange = (field, value) => {
         onUpdate(index, field, value);
     };
 
+    // 날짜 형식 검증 함수
     const validateDate = (date) => {
         return /^\d{4}\.\d{2}$/.test(date);
     };
 
+    // 날짜 입력 변경 핸들러
     const handleDateChange = (value) => {
         handleInputChange('date', value);
         if (validateDate(value) || value === '') {
@@ -39,6 +45,7 @@ const LanguageRecord = ({ index, language, onRemove, onUpdate, resumeId }) => {
         }
     };
 
+    // 삭제 핸들러
     const handleRemove = async () => {
         try {
             await call(`/api/resumes/${resumeId}/languages/${language.id}`, "DELETE");
